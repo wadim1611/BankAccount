@@ -4,6 +4,7 @@ using BankAccount.Api.Contracts.V1.Requests;
 using BankAccount.Api.Contracts.V1.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace BankAccount.Api.Controllers.V1
@@ -18,6 +19,7 @@ namespace BankAccount.Api.Controllers.V1
         }
 
         [HttpGet(ApiRoutes.Users.GetAll)]
+        [ProducesResponseType(typeof(IEnumerable<UserModel>), 200)]
         public async Task<IActionResult> Get()
         {
             var users = await _userManager.GetAllAsync();
@@ -25,13 +27,23 @@ namespace BankAccount.Api.Controllers.V1
         }
 
         [HttpGet(ApiRoutes.Users.Get)]
+        [ProducesResponseType(typeof(UserModel), 200)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Get(int id)
         {
             var user = await _userManager.GetByIdAsync(id);
-            return new JsonResult(user);
+            if(user != null)
+            {
+                return new JsonResult(user);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
         [HttpPost(ApiRoutes.Users.Create)]
+        [ProducesResponseType(typeof(UserModel), 201)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> Post([FromBody] UserSaveModel model)
         {
@@ -40,6 +52,7 @@ namespace BankAccount.Api.Controllers.V1
         }
 
         [HttpPut(ApiRoutes.Users.Update)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> Put(int id, [FromBody] UserSaveModel model)
         {
@@ -48,6 +61,7 @@ namespace BankAccount.Api.Controllers.V1
         }
 
         [HttpDelete(ApiRoutes.Users.Delete)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> Delete(int id)
         {

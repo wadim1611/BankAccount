@@ -4,6 +4,7 @@ using BankAccount.Api.Contracts.V1.Requests;
 using BankAccount.Api.Contracts.V1.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace BankAccount.Api.Controllers.V1
@@ -18,20 +19,31 @@ namespace BankAccount.Api.Controllers.V1
         }
 
         [HttpGet(ApiRoutes.Currencies.GetAll)]
+        [ProducesResponseType(typeof(IEnumerable<CurrencyModel>), 200)]
         public async Task<IActionResult> Get()
         {
-            var accounts = await _currencyManager.GetAllAsync();
-            return new JsonResult(accounts);
+            var currencies = await _currencyManager.GetAllAsync();
+            return new JsonResult(currencies);
         }
 
         [HttpGet(ApiRoutes.Currencies.Get)]
+        [ProducesResponseType(typeof(CurrencyModel), 200)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Get(int id)
         {
-            var account = await _currencyManager.GetByIdAsync(id);
-            return new JsonResult(account);
+            var currency = await _currencyManager.GetByIdAsync(id);
+            if(currency != null)
+            {
+                return new JsonResult(currency);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
         [HttpPost(ApiRoutes.Currencies.Create)]
+        [ProducesResponseType(typeof(CurrencyModel), 201)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> Post([FromBody] CurrencySaveModel model)
         {
@@ -40,6 +52,7 @@ namespace BankAccount.Api.Controllers.V1
         }
 
         [HttpPut(ApiRoutes.Currencies.Update)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> Put(int id, [FromBody] CurrencySaveModel model)
         {
@@ -48,6 +61,7 @@ namespace BankAccount.Api.Controllers.V1
         }
 
         [HttpDelete(ApiRoutes.Currencies.Delete)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task Delete(int id)
         {

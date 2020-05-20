@@ -4,6 +4,7 @@ using BankAccount.Api.Contracts.V1.Requests;
 using BankAccount.Api.Contracts.V1.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace BankAccount.Api.Controllers.V1
@@ -18,6 +19,7 @@ namespace BankAccount.Api.Controllers.V1
         }
 
         [HttpGet(ApiRoutes.Accounts.GetAll)]
+        [ProducesResponseType(typeof(IEnumerable<AccountModel>), 200)]
         public async Task<IActionResult> Get()
         {
             var accounts = await _accountManager.GetAll();
@@ -25,13 +27,23 @@ namespace BankAccount.Api.Controllers.V1
         }
 
         [HttpGet(ApiRoutes.Accounts.Get)]
+        [ProducesResponseType(typeof(AccountModel), 200)]
+        [ProducesResponseType(404)]
         public async Task<IActionResult> Get(int id)
         {
             var account = await _accountManager.GetById(id);
-            return new JsonResult(account);
+            if(account != null)
+            {
+                return new JsonResult(account);
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
         [HttpPost(ApiRoutes.Accounts.Create)]
+        [ProducesResponseType(typeof(AccountModel), 201)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> Post([FromBody] AccountSaveModel model)
         {
@@ -40,6 +52,7 @@ namespace BankAccount.Api.Controllers.V1
         }
 
         [HttpPut(ApiRoutes.Accounts.Debit)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> Debit([FromBody] AccountDebitModel model)
         {
@@ -48,6 +61,7 @@ namespace BankAccount.Api.Controllers.V1
         }
 
         [HttpPut(ApiRoutes.Accounts.Withdraw)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> Withdraw([FromBody] AccountWithdrawModel model)
         {
@@ -56,6 +70,7 @@ namespace BankAccount.Api.Controllers.V1
         }
 
         [HttpPut(ApiRoutes.Accounts.Transfer)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> Transfer([FromBody] AccountTransferMoneyModel model)
         {
@@ -64,6 +79,7 @@ namespace BankAccount.Api.Controllers.V1
         }
 
         [HttpDelete(ApiRoutes.Accounts.Delete)]
+        [ProducesResponseType(200)]
         [ProducesResponseType(typeof(ErrorResponse), 400)]
         public async Task<IActionResult> Delete(int id)
         {
